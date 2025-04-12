@@ -101,5 +101,22 @@ describe("My Token", () => {
           )
       ).to.be.revertedWith("insufficient allowance");
     });
+    // 아래 내용은 실제로 보내는 내용 (과제)
+    describe("Task", () => {
+      it("should be pass", async () => {
+        const signer0 = signers[0];
+        const signer1 = signers[1];
+        await myTokenC
+          .connect(signer0)
+          .approve(signer1.address, hre.ethers.parseUnits("99", decimals));
+        await myTokenC
+          .connect(signer1)
+          .transferFrom(
+            signer0.address,
+            signer1.address,
+            hre.ethers.parseUnits("99", decimals)
+          );
+      });
+    });
   });
 });
