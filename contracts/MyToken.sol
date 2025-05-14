@@ -35,7 +35,7 @@ contract MyToken is ManagedAccess {
     modifier onlyManager() override {
         require(
             msg.sender == manager,
-            "You are not authorized to manage this token"
+            "You are not authorized to manage this contract"
         );
         _;
     }

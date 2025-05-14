@@ -4,9 +4,6 @@ import { MyToken } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { DECIMALS, MINTING_AMOUNT } from "./constant";
 
-const MINTING_AMOUNT = 100n;
-const DECIMALS = 18n;
-
 describe("My Token", () => {
   let myTokenC: MyToken;
   let signers: HardhatEthersSigner[];
@@ -49,10 +46,10 @@ describe("My Token", () => {
     // TDD: Test Driven Development
     it("should return or revert when minting infinitly", async () => {
       const hacker = signers[2];
-      const mintingAgaionAmount = hre.ethers.parseUnits("10000", DECIMALS);
+      const mintingAgainAmount = hre.ethers.parseUnits("10000", DECIMALS);
       await expect(
-        myTokenC.connect(hacker).mint(mintingAgaionAmount, hacker.address)
-      ).to.be.revertedWith("You are not authorized to manage this token");
+        myTokenC.connect(hacker).mint(mintingAgainAmount, hacker.address)
+      ).to.be.revertedWith("You are not authorized to manage this contract");
     });
   });
 
@@ -68,8 +65,7 @@ describe("My Token", () => {
           signer0.address,
           signer1.address,
           hre.ethers.parseUnits("0.5", DECIMALS)
-        );
-      expect(1)
+        )
         .to.emit(myTokenC, "Transfer")
         .withArgs(
           signer0.address,
@@ -113,21 +109,31 @@ describe("My Token", () => {
       ).to.be.revertedWith("insufficient allowance");
     });
     // 아래 내용은 실제로 보내는 내용 (과제)
-    describe("Task", () => {
-      it("should be pass", async () => {
-        const signer0 = signers[0];
-        const signer1 = signers[1];
-        await myTokenC
+    it("should emit Transfer event", async () => {
+      const signer0 = signers[0];
+      const signer1 = signers[1];
+      await expect(
+        myTokenC
           .connect(signer0)
-          .approve(signer1.address, hre.ethers.parseUnits("99", DECIMALS));
-        await myTokenC
+          .approve(signer1.address, hre.ethers.parseUnits("99", DECIMALS))
+      )
+        .to.emit(myTokenC, "Approval")
+        .withArgs(signer1.address, hre.ethers.parseUnits("99", DECIMALS));
+      await expect(
+        myTokenC
           .connect(signer1)
           .transferFrom(
             signer0.address,
             signer1.address,
             hre.ethers.parseUnits("99", DECIMALS)
-          );
-      });
+          )
+      )
+        .to.emit(myTokenC, "Transfer")
+        .withArgs(
+          signer0.address,
+          signer1.address,
+          hre.ethers.parseUnits("99", DECIMALS)
+        );
     });
   });
 });
